@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.*
+*.local
+.DS_Store
+Thumbs.db
+
+# 이 컴퓨터 전용 설정
+.claude/
+
+# 학교 사진: 얼굴·이름표 확인과 학교 허락 전까지 올리지 않음
+상세사진/
+평면도.jpg
