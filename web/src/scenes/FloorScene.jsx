@@ -14,6 +14,7 @@ const FLOOR_COLOR = {
   classroom: '#aebbd0',
   room: '#d6d4cc',
   toilet: '#c3d4cf',
+  lounge: '#d9c7a3',
   stairs: '#9fa4a8',
   elevator: '#5b6168',
   shaft: '#8b9095',
@@ -39,7 +40,7 @@ function solidSegments(L, doors) {
 
 function doorCenters(space, L) {
   if (space.type === 'classroom') return [-(L / 2 - 1.2), L / 2 - 1.2] // 앞문·뒷문
-  if (space.type === 'stairs') return null // 복도 쪽이 통째로 열림
+  if (space.type === 'stairs' || space.type === 'lounge') return null // 복도 쪽이 통째로 열림
   return [0]
 }
 
