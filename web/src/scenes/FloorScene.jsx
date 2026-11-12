@@ -1,5 +1,6 @@
 import { OrbitControls, Grid, Text, Billboard } from '@react-three/drei'
 import floor from '../map/floor.json'
+import Classroom from '../models/Classroom'
 
 const H = floor.height
 const T = floor.wallThickness / 2 // 맞닿은 두 방의 벽이 합쳐져 wallThickness가 되도록 절반씩
@@ -141,6 +142,25 @@ function Space({ space }) {
   const isClassroom = type === 'classroom'
   const hasWalls = !NO_WALLS.has(type)
 
+  // 교실은 상세 모델을 놓는다. 모델의 복도 쪽은 A타입 +z, B타입 -z 이므로
+  // 실제 문이 난 쪽(door)과 맞지 않으면 반 바퀴 돌린다.
+  if (isClassroom) {
+    const variant = space.variant ?? 'B'
+    const modelCorridor = variant === 'B' ? 'back' : 'front'
+    return (
+      <group position={[x + w / 2, 0, -(z + d / 2)]}>
+        <group rotation={[0, space.door === modelCorridor ? 0 : Math.PI, 0]}>
+          <Classroom variant={variant} />
+        </group>
+        <Billboard position={[0, H + 0.9, 0]}>
+          <Text fontSize={1.5} color="#1f3a8a" outlineWidth={0.06} outlineColor="#ffffff" anchorX="center" anchorY="middle">
+            {label}
+          </Text>
+        </Billboard>
+      </group>
+    )
+  }
+
   return (
     <group position={[x + w / 2, 0, -(z + d / 2)]}>
       {/* 바닥 */}
@@ -166,13 +186,6 @@ function Space({ space }) {
         </Billboard>
       )}
 
-      {/* 사람 크기 기준 막대 (키 1.7m) */}
-      {space.id === '2-1' && (
-        <mesh position={[0, 0.85, 0]} castShadow>
-          <capsuleGeometry args={[0.22, 1.26, 4, 12]} />
-          <meshStandardMaterial color="#e2674a" />
-        </mesh>
-      )}
     </group>
   )
 }

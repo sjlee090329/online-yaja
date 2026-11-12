@@ -10,6 +10,7 @@
     "마주 보는 관계(어느 교실 앞에 무엇이 있는지)는 상세사진 파일 이름을 따랐다.",
     "어림값: 교실 외 모든 공간의 폭, 연결부 안의 방 크기, 옥상 크기, 벽 두께, 문 위치.",
     "door = 복도와 맞닿아 문이 나는 면 (front=앞, back=뒤, left=왼쪽, right=오른쪽).",
+    "교실의 variant: A = 칠판을 볼 때 문이 왼쪽·창이 오른쪽 (2-1, 2-14). 생략하면 B = 좌우 반대 (나머지 12개 반). 사용자 확인.",
     "type lounge = 복도 쪽 벽이 없이 트인 공간. type solid = 들어갈 수 없게 막힌 덩어리. drop = 겹치는 바닥을 살짝 낮춤.",
     "walls = 방에 속하지 않는 독립 벽 (기본 좌표). windows=true면 창문 벽."
   ],
@@ -44,7 +45,7 @@
     { "id": "wc-b2",      "label": "직원 화장실",   "type": "toilet",    "x": 32, "z": 11, "w": 6, "d": 8, "door": "front" },
     { "id": "dream",      "label": "드림쉼터",      "type": "lounge",    "x": 38, "z": 11, "w": 8, "d": 8, "door": "front" },
     { "id": "office-1",   "label": "2학년 교무실1", "type": "room",      "x": 46, "z": 11, "w": 8, "d": 8, "door": "front" },
-    { "id": "2-1",        "label": "2-1",           "type": "classroom", "x": 54, "z": 11, "w": 8, "d": 8, "door": "front" },
+    { "variant": "A", "id": "2-1",        "label": "2-1",           "type": "classroom", "x": 54, "z": 11, "w": 8, "d": 8, "door": "front" },
     { "id": "counsel",    "label": "2학년 상담실",  "type": "room",      "x": 62, "z": 11, "w": 4, "d": 8, "door": "front" },
     { "id": "stairs-b",   "label": "계단 2",        "type": "stairs",    "x": 66, "z": 11, "w": 4, "d": 8, "door": "front" },
 
@@ -66,7 +67,7 @@
     { "frame": "back", "id": "wc-d1",      "label": "장애인 화장실",         "type": "toilet",    "x": 8.2,  "z": 11, "w": 5,   "d": 8, "door": "front" },
     { "frame": "back", "id": "wc-d2",      "label": "학생 화장실 3",         "type": "toilet",    "x": 13.2, "z": 11, "w": 6,   "d": 8, "door": "front" },
     { "frame": "back", "id": "jiseong",    "label": "지성쉼터",              "type": "lounge",    "x": 19.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
-    { "frame": "back", "id": "2-14",       "label": "2-14",                  "type": "classroom", "x": 27.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
+    { "frame": "back", "variant": "A", "id": "2-14",       "label": "2-14",                  "type": "classroom", "x": 27.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
     { "frame": "back", "id": "office-2",   "label": "2학년 교무실2",         "type": "room",      "x": 35.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
     { "frame": "back", "id": "meeting",    "label": "협의실",                "type": "room",      "x": 43.2, "z": 11, "w": 3,   "d": 8, "door": "front" },
     { "frame": "back", "id": "stairs-d",   "label": "계단 4",                "type": "stairs",    "x": 46.2, "z": 11, "w": 5,   "d": 8, "door": "front" },
