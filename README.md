@@ -19,6 +19,9 @@ npm run dev
 
 - `web/` — 화면 (React + Vite + React Three Fiber)
 - `web/src/map/floor.json` — 층 배치 데이터 (미터 단위). 방을 옮기거나 치수를 고칠 때는 이 파일만 수정한다.
+- `web/src/map/classroom.json` — 교실 템플릿 치수 (책상, 사물함, 문, 창문 등)
+- `web/src/models/` — 교실과 가구 모델. 색은 `palette.js`에 모여 있다.
+- `web/src/scenes/` — 화면 두 개: 층 전체(`#floor`), 교실 작업실(`#classroom`)
 - `.github/workflows/deploy.yml` — `main`에 올리면 GitHub Pages로 자동 배포
 
 학교 사진은 저장소에 올리지 않는다 (`.gitignore` 참고).
