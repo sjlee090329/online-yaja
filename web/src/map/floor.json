@@ -1,18 +1,25 @@
 {
   "_comment": [
-    "단위는 미터. x = 건물 긴 방향(2-9 쪽이 0), z = 앞(2-9~2-2 줄)에서 뒤(2-14 줄)로 가는 방향.",
+    "단위는 미터. 건물은 'ㄷ'자: 앞 건물(2-9~2-2 줄) + 왼쪽 연결부 + 뒤 건물(2-10~2-13 줄).",
+    "기본 좌표: x = 앞 건물의 긴 방향(2-9 쪽이 0), z = 앞에서 뒤로 가는 방향.",
+    "뒤 건물은 앞 건물과 나란하지 않고 틀어져 있어서, frame이 'back'인 공간은 frames.back 기준의 자체 좌표를 쓴다.",
+    "  (back 좌표: x = 뒤 건물의 긴 방향, z = 중정 쪽 가장자리에서 바깥쪽으로)",
     "각 공간은 왼쪽-앞 모서리(x, z)와 폭(w), 깊이(d)로 정의한다.",
     "실측값: 교실 8x8m, 층고 2.5m, 복도 폭 3m (사용자 제공).",
+    "지도 윤곽에서 잰 값: 앞 건물 약 70x19m, 뒤 건물 약 51x19m, 두 건물이 이루는 각 약 22도, 연결부 폭 약 14m, 두 건물 사이 거리 서쪽 약 21m.",
     "마주 보는 관계(어느 교실 앞에 무엇이 있는지)는 상세사진 파일 이름을 따랐다.",
-    "어림값: 교실 외 모든 공간의 폭, 세 줄 사이 간격, 중정 폭, 옥상 크기, 벽 두께, 문 위치.",
+    "어림값: 교실 외 모든 공간의 폭, 연결부 안의 방 크기, 옥상 크기, 벽 두께, 문 위치.",
     "door = 복도와 맞닿아 문이 나는 면 (front=앞, back=뒤, left=왼쪽, right=오른쪽).",
-    "type lounge = 복도 쪽 벽이 없이 트인 공간 (쉼터, 휴게공간, 개수대). type solid = 들어갈 수 없게 막힌 덩어리.",
-    "walls = 방에 속하지 않는 독립 벽. (x1,z1)에서 (x2,z2)까지, x나 z 한쪽이 같아야 한다. windows=true면 창문 벽."
+    "type lounge = 복도 쪽 벽이 없이 트인 공간. type solid = 들어갈 수 없게 막힌 덩어리. drop = 겹치는 바닥을 살짝 낮춤.",
+    "walls = 방에 속하지 않는 독립 벽 (기본 좌표). windows=true면 창문 벽."
   ],
   "height": 2.5,
   "wallThickness": 0.2,
+  "frames": {
+    "back": { "originX": 7.0, "originZ": 33.8, "angleDeg": 22 }
+  },
   "walls": [
-    { "id": "wing-window-wall", "x1": 11, "z1": 19, "x2": 11, "z2": 31, "windows": true }
+    { "id": "wing-window-wall", "x1": 14.4, "z1": 19, "x2": 14.4, "z2": 39, "windows": true }
   ],
   "spaces": [
     { "id": "2-9", "label": "2-9", "type": "classroom", "x": 0,  "z": 0, "w": 8, "d": 8, "door": "back" },
@@ -27,10 +34,11 @@
 
     { "id": "corridor-1", "label": "", "type": "corridor", "x": 0, "z": 8, "w": 70, "d": 3 },
 
-    { "id": "ev",         "label": "E/V",           "type": "elevator",  "x": 11, "z": 11, "w": 3, "d": 3, "door": "left" },
-    { "id": "pit",        "label": "",              "type": "solid",     "x": 14, "z": 11, "w": 2, "d": 3 },
-    { "id": "stairs-ev",  "label": "계단 1",         "type": "stairs",    "x": 11, "z": 14, "w": 5, "d": 5, "door": "left" },
-    { "id": "wc-b1",      "label": "학생 화장실 1", "type": "toilet",    "x": 16, "z": 11, "w": 8, "d": 8, "door": "front" },
+    { "id": "wee",        "label": "위클래스",      "type": "room",      "x": 0,    "z": 11, "w": 8.4, "d": 8, "door": "right" },
+    { "id": "ev",         "label": "E/V",           "type": "elevator",  "x": 14.4, "z": 11, "w": 2.5, "d": 3, "door": "left" },
+    { "id": "pit",        "label": "",              "type": "solid",     "x": 16.9, "z": 11, "w": 1.5, "d": 3 },
+    { "id": "stairs-ev",  "label": "계단 1",        "type": "stairs",    "x": 14.4, "z": 14, "w": 4,   "d": 5, "door": "left" },
+    { "id": "wc-b1",      "label": "학생 화장실 1", "type": "toilet",    "x": 18.4, "z": 11, "w": 5.6, "d": 8, "door": "front" },
     { "id": "sink",       "label": "개수대",        "type": "lounge",    "x": 24, "z": 11, "w": 3, "d": 8, "door": "front" },
     { "id": "wc-b1b",     "label": "학생 화장실 2", "type": "toilet",    "x": 27, "z": 11, "w": 5, "d": 8, "door": "front" },
     { "id": "wc-b2",      "label": "직원 화장실",   "type": "toilet",    "x": 32, "z": 11, "w": 6, "d": 8, "door": "front" },
@@ -38,29 +46,30 @@
     { "id": "office-1",   "label": "2학년 교무실1", "type": "room",      "x": 46, "z": 11, "w": 8, "d": 8, "door": "front" },
     { "id": "2-1",        "label": "2-1",           "type": "classroom", "x": 54, "z": 11, "w": 8, "d": 8, "door": "front" },
     { "id": "counsel",    "label": "2학년 상담실",  "type": "room",      "x": 62, "z": 11, "w": 4, "d": 8, "door": "front" },
-    { "id": "stairs-b",   "label": "계단 2",         "type": "stairs",    "x": 66, "z": 11, "w": 4, "d": 8, "door": "front" },
+    { "id": "stairs-b",   "label": "계단 2",        "type": "stairs",    "x": 66, "z": 11, "w": 4, "d": 8, "door": "front" },
 
-    { "id": "wee",        "label": "위클래스",      "type": "room", "x": 0, "z": 11, "w": 6, "d": 8, "door": "right" },
-    { "id": "social",     "label": "사회실",        "type": "room", "x": 0, "z": 19, "w": 6, "d": 5, "door": "right" },
-    { "id": "career",     "label": "진로진학실·활동실", "type": "room", "x": 0, "z": 24, "w": 6, "d": 7, "door": "right" },
-    { "id": "corridor-wing", "label": "", "type": "corridor", "x": 6, "z": 11, "w": 5, "d": 20 },
+    { "id": "social",     "label": "사회실",            "type": "room", "x": 0, "z": 19, "w": 8.4, "d": 10, "door": "right" },
+    { "id": "career",     "label": "진로진학실·활동실", "type": "room", "x": 0, "z": 29, "w": 8.4, "d": 11, "door": "right" },
+    { "id": "corridor-wing", "label": "", "type": "corridor", "x": 8.4, "z": 11, "w": 6, "d": 35 },
+    { "id": "junction",      "label": "", "type": "corridor", "x": 0,   "z": 40, "w": 8.4, "d": 6, "drop": 0.02 },
 
-    { "id": "stairs-c", "label": "계단 3","type": "stairs",    "x": 16, "z": 23, "w": 6, "d": 8, "door": "back" },
-    { "id": "2-10",     "label": "2-10", "type": "classroom", "x": 22, "z": 23, "w": 8, "d": 8, "door": "back" },
-    { "id": "2-11",     "label": "2-11", "type": "classroom", "x": 30, "z": 23, "w": 8, "d": 8, "door": "back" },
-    { "id": "2-12",     "label": "2-12", "type": "classroom", "x": 38, "z": 23, "w": 8, "d": 8, "door": "back" },
-    { "id": "2-13",     "label": "2-13", "type": "classroom", "x": 46, "z": 23, "w": 8, "d": 8, "door": "back" },
+    { "frame": "back", "id": "hall-c",   "label": "",       "type": "corridor",  "x": 3,    "z": 3, "w": 10.2, "d": 5, "drop": 0.01 },
+    { "frame": "back", "id": "stairs-c", "label": "계단 3", "type": "stairs",    "x": 13.2, "z": 3, "w": 6, "d": 5, "door": "back" },
+    { "frame": "back", "id": "2-10",     "label": "2-10",   "type": "classroom", "x": 19.2, "z": 0, "w": 8, "d": 8, "door": "back" },
+    { "frame": "back", "id": "2-11",     "label": "2-11",   "type": "classroom", "x": 27.2, "z": 0, "w": 8, "d": 8, "door": "back" },
+    { "frame": "back", "id": "2-12",     "label": "2-12",   "type": "classroom", "x": 35.2, "z": 0, "w": 8, "d": 8, "door": "back" },
+    { "frame": "back", "id": "2-13",     "label": "2-13",   "type": "classroom", "x": 43.2, "z": 0, "w": 8, "d": 8, "door": "back" },
 
-    { "id": "corridor-2", "label": "", "type": "corridor", "x": 0, "z": 31, "w": 54, "d": 3 },
+    { "frame": "back", "id": "corridor-2", "label": "", "type": "corridor", "x": 3, "z": 8, "w": 48.2, "d": 3, "drop": 0.01 },
 
-    { "id": "humanities", "label": "인문사회부·진로진학부", "type": "room",      "x": 0,  "z": 34, "w": 11, "d": 8, "door": "front" },
-    { "id": "wc-d1",      "label": "장애인 화장실",         "type": "toilet",    "x": 11, "z": 34, "w": 5,  "d": 8, "door": "front" },
-    { "id": "wc-d2",      "label": "학생 화장실 3",         "type": "toilet",    "x": 16, "z": 34, "w": 6,  "d": 8, "door": "front" },
-    { "id": "jiseong",    "label": "지성쉼터",              "type": "lounge",    "x": 22, "z": 34, "w": 8,  "d": 8, "door": "front" },
-    { "id": "2-14",       "label": "2-14",                  "type": "classroom", "x": 30, "z": 34, "w": 8,  "d": 8, "door": "front" },
-    { "id": "office-2",   "label": "2학년 교무실2",         "type": "room",      "x": 38, "z": 34, "w": 8,  "d": 8, "door": "front" },
-    { "id": "meeting",    "label": "협의실",                "type": "room",      "x": 46, "z": 34, "w": 3,  "d": 8, "door": "front" },
-    { "id": "stairs-d",   "label": "계단 4",                "type": "stairs",    "x": 49, "z": 34, "w": 5,  "d": 8, "door": "front" },
+    { "frame": "back", "id": "humanities", "label": "인문사회부·진로진학부", "type": "room",      "x": -1,   "z": 11, "w": 9.2, "d": 8, "door": "front" },
+    { "frame": "back", "id": "wc-d1",      "label": "장애인 화장실",         "type": "toilet",    "x": 8.2,  "z": 11, "w": 5,   "d": 8, "door": "front" },
+    { "frame": "back", "id": "wc-d2",      "label": "학생 화장실 3",         "type": "toilet",    "x": 13.2, "z": 11, "w": 6,   "d": 8, "door": "front" },
+    { "frame": "back", "id": "jiseong",    "label": "지성쉼터",              "type": "lounge",    "x": 19.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
+    { "frame": "back", "id": "2-14",       "label": "2-14",                  "type": "classroom", "x": 27.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
+    { "frame": "back", "id": "office-2",   "label": "2학년 교무실2",         "type": "room",      "x": 35.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
+    { "frame": "back", "id": "meeting",    "label": "협의실",                "type": "room",      "x": 43.2, "z": 11, "w": 3,   "d": 8, "door": "front" },
+    { "frame": "back", "id": "stairs-d",   "label": "계단 4",                "type": "stairs",    "x": 46.2, "z": 11, "w": 5,   "d": 8, "door": "front" },
 
     { "id": "roof",   "label": "ROOF",     "type": "outdoor", "x": -14, "z": 0,  "w": 14, "d": 10 },
     { "id": "garden", "label": "옥상정원", "type": "outdoor", "x": -14, "z": 10, "w": 14, "d": 14 }

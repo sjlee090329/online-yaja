@@ -6,9 +6,10 @@ const T = floor.wallThickness / 2 // 맞닿은 두 방의 벽이 합쳐져 wallT
 const DOOR_W = 1.0
 const DOOR_H = 2.1
 
-// 지도 좌표(왼쪽-앞 모서리 기준) → 화면 좌표. 층 한가운데가 원점, 뒤쪽이 -z.
+// 지도 좌표 → 화면 좌표: 지도의 (x, z)는 화면의 (x, -z). 뒤쪽이 -z.
+// 전체를 CENTER만큼 옮겨 층 한가운데가 원점에 오게 한다 (FloorScene의 바깥 group).
 const CENTER_X = 28
-const CENTER_Z = 21
+const CENTER_Z = 34
 
 const FLOOR_COLOR = {
   classroom: '#aebbd0',
@@ -84,7 +85,7 @@ function FreeWall({ wall }) {
   const alongZ = x1 === x2
   const L = alongZ ? Math.abs(z2 - z1) : Math.abs(x2 - x1)
   const t = floor.wallThickness
-  const position = [(x1 + x2) / 2 - CENTER_X, 0, -(z1 + z2) / 2 + CENTER_Z]
+  const position = [(x1 + x2) / 2, 0, -(z1 + z2) / 2]
   const size = (len, h, thick = t) => (alongZ ? [thick, h, len] : [len, h, thick])
   const at = (along, y) => (alongZ ? [0, y, along] : [along, y, 0])
   const SILL = 0.9
@@ -130,7 +131,7 @@ function Space({ space }) {
   // 막힌 덩어리: 천장까지 꽉 찬 상자
   if (type === 'solid') {
     return (
-      <mesh position={[x + w / 2 - CENTER_X, H / 2, -(z + d / 2) + CENTER_Z]} castShadow receiveShadow>
+      <mesh position={[x + w / 2, H / 2, -(z + d / 2)]} castShadow receiveShadow>
         <boxGeometry args={[w, H, d]} />
         <meshStandardMaterial color={WALL_COLOR} />
       </mesh>
@@ -141,9 +142,9 @@ function Space({ space }) {
   const hasWalls = !NO_WALLS.has(type)
 
   return (
-    <group position={[x + w / 2 - CENTER_X, 0, -(z + d / 2) + CENTER_Z]}>
+    <group position={[x + w / 2, 0, -(z + d / 2)]}>
       {/* 바닥 */}
-      <mesh position={[0, -0.05, 0]} receiveShadow>
+      <mesh position={[0, -0.05 - (space.drop ?? 0), 0]} receiveShadow>
         <boxGeometry args={[w, 0.1, d]} />
         <meshStandardMaterial color={FLOOR_COLOR[type]} />
       </mesh>
@@ -176,7 +177,9 @@ function Space({ space }) {
   )
 }
 
-export const floorCamera = { position: [-12, 80, 78], fov: 50, far: 500 }
+export const floorCamera = { position: [-14, 100, 92], fov: 50, far: 600 }
+
+const mainSpaces = floor.spaces.filter((s) => !s.frame)
 
 // 층 전체 그레이박스
 export default function FloorScene() {
@@ -188,19 +191,31 @@ export default function FloorScene() {
         intensity={1.5}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-60}
-        shadow-camera-right={60}
-        shadow-camera-top={60}
-        shadow-camera-bottom={-60}
+        shadow-camera-left={-80}
+        shadow-camera-right={80}
+        shadow-camera-top={80}
+        shadow-camera-bottom={-80}
         shadow-camera-far={200}
       />
 
-      {floor.spaces.map((space) => (
-        <Space key={space.id} space={space} />
-      ))}
-      {(floor.walls ?? []).map((wall) => (
-        <FreeWall key={wall.id} wall={wall} />
-      ))}
+      <group position={[-CENTER_X, 0, CENTER_Z]}>
+        {mainSpaces.map((space) => (
+          <Space key={space.id} space={space} />
+        ))}
+        {(floor.walls ?? []).map((wall) => (
+          <FreeWall key={wall.id} wall={wall} />
+        ))}
+        {/* 틀어진 건물: 자체 좌표를 쓰는 공간 묶음 */}
+        {Object.entries(floor.frames ?? {}).map(([name, f]) => (
+          <group key={name} position={[f.originX, 0, -f.originZ]} rotation={[0, (f.angleDeg * Math.PI) / 180, 0]}>
+            {floor.spaces
+              .filter((s) => s.frame === name)
+              .map((space) => (
+                <Space key={space.id} space={space} />
+              ))}
+          </group>
+        ))}
+      </group>
 
       {/* 1칸 = 1m 격자 */}
       <Grid
@@ -213,7 +228,7 @@ export default function FloorScene() {
         infiniteGrid
       />
 
-      <OrbitControls makeDefault target={[0, 0, 0]} maxPolarAngle={Math.PI / 2.05} minDistance={3} maxDistance={160} />
+      <OrbitControls makeDefault target={[0, 0, 0]} maxPolarAngle={Math.PI / 2.05} minDistance={3} maxDistance={220} />
     </>
   )
 }
