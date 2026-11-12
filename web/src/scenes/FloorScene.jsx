@@ -78,8 +78,65 @@ function Wall({ space, side }) {
   )
 }
 
+// 방에 속하지 않는 독립 벽. 창문 벽이면 창턱 + 유리 + 윗벽 + 기둥으로 그린다.
+function FreeWall({ wall }) {
+  const { x1, z1, x2, z2, windows } = wall
+  const alongZ = x1 === x2
+  const L = alongZ ? Math.abs(z2 - z1) : Math.abs(x2 - x1)
+  const t = floor.wallThickness
+  const position = [(x1 + x2) / 2 - CENTER_X, 0, -(z1 + z2) / 2 + CENTER_Z]
+  const size = (len, h, thick = t) => (alongZ ? [thick, h, len] : [len, h, thick])
+  const at = (along, y) => (alongZ ? [0, y, along] : [along, y, 0])
+  const SILL = 0.9
+  const TOP = 2.1
+
+  if (!windows) {
+    return (
+      <mesh position={[position[0], H / 2, position[2]]} castShadow receiveShadow>
+        <boxGeometry args={size(L, H)} />
+        <meshStandardMaterial color={WALL_COLOR} />
+      </mesh>
+    )
+  }
+
+  const posts = Array.from({ length: Math.round(L / 3) + 1 }, (_, i) => -L / 2 + (L * i) / Math.round(L / 3))
+  return (
+    <group position={position}>
+      <mesh position={at(0, SILL / 2)} castShadow receiveShadow>
+        <boxGeometry args={size(L, SILL)} />
+        <meshStandardMaterial color={WALL_COLOR} />
+      </mesh>
+      <mesh position={at(0, (H + TOP) / 2)} castShadow>
+        <boxGeometry args={size(L, H - TOP)} />
+        <meshStandardMaterial color={WALL_COLOR} />
+      </mesh>
+      {posts.map((p) => (
+        <mesh key={p} position={at(p, (SILL + TOP) / 2)} castShadow>
+          <boxGeometry args={size(0.3, TOP - SILL)} />
+          <meshStandardMaterial color={WALL_COLOR} />
+        </mesh>
+      ))}
+      <mesh position={at(0, (SILL + TOP) / 2)}>
+        <boxGeometry args={size(L, TOP - SILL, 0.04)} />
+        <meshStandardMaterial color="#9fd0ea" transparent opacity={0.45} />
+      </mesh>
+    </group>
+  )
+}
+
 function Space({ space }) {
   const { x, z, w, d, type, label } = space
+
+  // 막힌 덩어리: 천장까지 꽉 찬 상자
+  if (type === 'solid') {
+    return (
+      <mesh position={[x + w / 2 - CENTER_X, H / 2, -(z + d / 2) + CENTER_Z]} castShadow receiveShadow>
+        <boxGeometry args={[w, H, d]} />
+        <meshStandardMaterial color={WALL_COLOR} />
+      </mesh>
+    )
+  }
+
   const isClassroom = type === 'classroom'
   const hasWalls = !NO_WALLS.has(type)
 
@@ -140,6 +197,9 @@ export default function FloorScene() {
 
       {floor.spaces.map((space) => (
         <Space key={space.id} space={space} />
+      ))}
+      {(floor.walls ?? []).map((wall) => (
+        <FreeWall key={wall.id} wall={wall} />
       ))}
 
       {/* 1칸 = 1m 격자 */}
