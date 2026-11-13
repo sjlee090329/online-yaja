@@ -8,7 +8,8 @@
     "각 공간은 왼쪽-앞 모서리(x, z)와 폭(w), 깊이(d)로 정의한다. points가 있으면 꼭짓점 목록으로 된 다각형 방이다.",
     "실측값: 교실 8x8m, 층고 2.5m, 복도 폭 3m (사용자 제공).",
     "도면에서 잰 값: 앞 건물 68x19m, 휴게공간 폭 4m, 연결부 방 8.5m + 복도 5m, 뒤 건물 53x19m, 각 방의 폭.",
-    "어림값: 사회실과 진로진학실의 경계(도면에 유리벽이 안 그려져 있음), 인문사회부/진로진학부 구분, 옥상 크기, 벽 두께, 문 위치.",
+    "어림값: 사회실과 진로진학실의 경계(도면에 유리벽이 안 그려져 있음), 옥상 크기, 벽 두께, 문 위치.",
+    "사용자 확인: 인문사회부 옆방 = 여자 화장실, 그 옆 = 장애인 화장실, 남자 화장실. 인문사회부와 진로진학실 사이는 들어갈 수 없는 죽은 공간.",
     "교실의 variant: A = 칠판을 볼 때 문이 왼쪽·창이 오른쪽 (2-1, 2-14). 생략하면 B = 좌우 반대 (나머지 12개 반). 사용자 확인.",
     "door = 복도와 맞닿아 문이 나는 면 (front=앞, back=뒤, left=왼쪽, right=오른쪽). doorEdges = 다각형 방에서 문이 나는 변의 번호.",
     "type lounge = 복도 쪽 벽이 없이 트인 공간. type solid = 들어갈 수 없게 막힌 덩어리. drop = 겹치는 바닥을 살짝 낮춤.",
@@ -53,13 +54,12 @@
 
     { "id": "social",     "label": "사회실",            "type": "room", "x": 0, "z": 19, "w": 8.5, "d": 11, "door": "right" },
     { "id": "career",     "label": "진로진학실·활동실", "type": "room", "x": 0, "z": 30, "w": 8.5, "d": 13, "door": "right" },
-    { "id": "store-nw",   "label": "",                  "type": "room", "x": 0, "z": 43, "w": 4.8, "d": 4.4, "door": "right" },
-    { "id": "hall-humanities", "label": "", "type": "corridor", "x": 4.8, "z": 43, "w": 3.7, "d": 4.4 },
+    { "id": "dead-nw",    "label": "",                  "type": "solid", "x": 0, "z": 43, "w": 8.5, "d": 3.6 },
     { "id": "corridor-wing",   "label": "", "type": "corridor", "x": 8.5, "z": 11, "w": 5,   "d": 36, "drop": 0.02 },
     { "id": "shaft",           "label": "", "type": "solid",    "x": 13.5, "z": 41.7, "w": 2.8, "d": 4.9 },
 
     { "id": "humanities", "label": "인문사회부", "type": "room",
-      "points": [[0, 47.4], [8.5, 47.4], [9.3, 48], [6.3, 55.4], [0, 52.8]], "doorEdges": [0] },
+      "points": [[0, 46.6], [8.5, 46.6], [9.3, 48], [6.3, 55.4], [0, 52.8]], "doorEdges": [1] },
 
     { "frame": "back", "id": "stairs-c", "label": "계단 3", "type": "stairs",    "x": 11.5, "z": 3, "w": 7,   "d": 5, "door": "back" },
     { "frame": "back", "id": "wall-c",   "label": "",       "type": "solid",     "x": 18.5, "z": 3, "w": 2.7, "d": 5 },
@@ -70,9 +70,9 @@
 
     { "frame": "back", "id": "corridor-2", "label": "", "type": "corridor", "x": 6.8, "z": 8, "w": 46.4, "d": 3, "drop": 0.01 },
 
-    { "frame": "back", "id": "career-office", "label": "진로진학부",   "type": "room",   "x": 6.8,  "z": 11, "w": 5.4, "d": 8, "door": "front" },
+    { "frame": "back", "id": "wc-d0",         "label": "여자 화장실",   "type": "toilet", "x": 6.8,  "z": 11, "w": 5.4, "d": 8, "door": "front" },
     { "frame": "back", "id": "wc-d1",      "label": "장애인 화장실",   "type": "toilet", "x": 12.2, "z": 11, "w": 2.3, "d": 8, "door": "front" },
-    { "frame": "back", "id": "wc-d2",      "label": "학생 화장실 3",   "type": "toilet", "x": 14.5, "z": 11, "w": 6.7, "d": 8, "door": "front" },
+    { "frame": "back", "id": "wc-d2",      "label": "남자 화장실",     "type": "toilet", "x": 14.5, "z": 11, "w": 6.7, "d": 8, "door": "front" },
     { "frame": "back", "id": "jiseong",    "label": "지성쉼터",        "type": "lounge", "x": 21.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
     { "frame": "back", "variant": "A", "id": "2-14", "label": "2-14", "type": "classroom", "x": 29.2, "z": 11, "w": 8, "d": 8, "door": "front" },
     { "frame": "back", "id": "office-2",   "label": "2학년 교무실2",   "type": "room",   "x": 37.2, "z": 11, "w": 8,   "d": 8, "door": "front" },
