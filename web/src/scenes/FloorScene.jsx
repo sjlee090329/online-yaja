@@ -3,6 +3,7 @@ import { DoubleSide, Shape } from 'three'
 import { OrbitControls, Grid, Text, Billboard } from '@react-three/drei'
 import floor from '../map/floor.json'
 import Classroom from '../models/Classroom'
+import { Shelter, RestArea, SinkAlcove } from '../models/Lounges'
 import WalkControls from './WalkControls'
 
 const H = floor.height
@@ -30,6 +31,8 @@ const WOOD = '#c9a06a'
 
 // 방 종류별 문짝 색
 const DOOR_COLOR = { room: WOOD, toilet: '#8fa3a1', elevator: '#b4b9be' }
+
+const MODEL_TURN = { front: 0, back: Math.PI, right: Math.PI / 2, left: -Math.PI / 2 }
 
 // 벽이 없는 공간
 const NO_WALLS = new Set(['corridor', 'outdoor'])
@@ -77,8 +80,38 @@ function NamePlate({ label, x, out, color = '#2f6fb5' }) {
 
 // 벽 한 줄. 원점은 벽 가운데 바닥, 로컬 x가 벽 방향.
 // doors: 문 중심 위치 목록. null이면 복도 쪽이 통째로 열린 입구(위쪽 보만 남김).
-function WallRun({ L, doors, type, label, out }) {
+// 유리벽: 검은 틀 + 유리. 문 자리는 유리문(통과 가능).
+function GlassRun({ L, doors }) {
+  const n = Math.max(1, Math.round(L / 1.2))
+  const posts = Array.from({ length: n + 1 }, (_, i) => -L / 2 + (L * i) / n)
+  return (
+    <>
+      {solidSegments(L, doors).map(([a, b]) => (
+        <Slab key={a} size={[b - a, H, 0.03]} position={[(a + b) / 2, H / 2, 0]} color="#bcd9e6" opacity={0.3} shadow={false} />
+      ))}
+      {doors.map((c) => (
+        <Slab key={c} size={[DOOR_W, DOOR_H, 0.03]} position={[c, DOOR_H / 2, 0]} color="#bcd9e6" opacity={0.2} shadow={false} passable />
+      ))}
+      {posts.map((p) => (
+        <Slab key={p} size={[0.05, H, 0.08]} position={[p, H / 2, 0]} color="#22262b" shadow={false} passable={doors.some((c) => Math.abs(c - p) < DOOR_W / 2)} />
+      ))}
+      {[0.03, DOOR_H, H - 0.03].map((y) => (
+        <Slab key={y} size={[L, 0.05, 0.08]} position={[0, y, 0]} color="#22262b" shadow={false} passable />
+      ))}
+    </>
+  )
+}
+
+function WallRun({ L, doors, type, label, out, glass = false }) {
   const open = doors === null
+  if (glass && !open) {
+    return (
+      <>
+        <GlassRun L={L} doors={doors} />
+        <NamePlate label={label} x={doors[0] ?? 0} out={out} />
+      </>
+    )
+  }
   const needsTactile = type === 'stairs' || type === 'toilet'
 
   return (
@@ -137,7 +170,7 @@ function Wall({ space, side }) {
 
   return (
     <group position={alongX ? [0, 0, sign * offset] : [sign * offset, 0, 0]} rotation={[0, alongX ? 0 : Math.PI / 2, 0]}>
-      <WallRun L={L} doors={isDoorSide ? doorCenters(space, L) : []} type={space.type} label={space.label} out={sign} />
+      <WallRun L={L} doors={isDoorSide ? doorCenters(space, L) : []} type={space.type} label={space.label} out={sign} glass={isDoorSide && space.glass} />
     </group>
   )
 }
@@ -165,7 +198,7 @@ function Ceiling({ w, d }) {
 
 // 방에 속하지 않는 독립 벽. 창문 벽이면 창턱 + 유리 + 윗벽 + 기둥으로 그린다.
 function FreeWall({ wall }) {
-  const { x1, z1, x2, z2, windows } = wall
+  const { x1, z1, x2, z2, windows, glass, color } = wall
   const alongZ = x1 === x2
   const L = alongZ ? Math.abs(z2 - z1) : Math.abs(x2 - x1)
   const t = floor.wallThickness
@@ -176,7 +209,9 @@ function FreeWall({ wall }) {
 
   return (
     <group position={[(x1 + x2) / 2, 0, -(z1 + z2) / 2]} rotation={[0, alongZ ? Math.PI / 2 : 0, 0]}>
-      {windows ? (
+      {glass ? (
+        <GlassRun L={L} doors={[]} />
+      ) : windows ? (
         <>
           <Slab size={[L, SILL, t]} position={[0, SILL / 2, 0]} color={WALL_COLOR} />
           <Slab size={[L, H - TOP, t]} position={[0, (H + TOP) / 2, 0]} color={WALL_COLOR} />
@@ -186,7 +221,7 @@ function FreeWall({ wall }) {
           <Slab size={[L, TOP - SILL, 0.04]} position={[0, (SILL + TOP) / 2, 0]} color="#9fd0ea" opacity={0.45} shadow={false} />
         </>
       ) : (
-        <Slab size={[L, H, t]} position={[0, H / 2, 0]} color={WALL_COLOR} />
+        <Slab size={[L, H, t]} position={[0, H / 2, 0]} color={color ?? WALL_COLOR} />
       )}
     </group>
   )
@@ -320,6 +355,16 @@ function Space({ space }) {
       {hasWalls && ['front', 'back', 'left', 'right'].map((side) => <Wall key={side} space={space} side={side} />)}
       {walk && type !== 'outdoor' && <Ceiling w={w} d={d} />}
 
+      {/* 내부 모델: 트인 면(+z)이 실제 복도 쪽을 보도록 돌린다 */}
+      {space.model && (
+        <group rotation={[0, MODEL_TURN[space.door] ?? 0, 0]}>
+          {space.model === 'shelter-blue' && <Shelter w={w} d={d} theme="blue" ceiling={walk} />}
+          {space.model === 'shelter-yellow' && <Shelter w={w} d={d} theme="yellow" ceiling={walk} />}
+          {space.model === 'rest' && <RestArea w={w} d={d} />}
+          {space.model === 'sink' && <SinkAlcove w={w} d={d} />}
+        </group>
+      )}
+
       <FloatingLabel label={label} position={[0, hasWalls ? H + 0.9 : 1.2, 0]} />
     </group>
   )
@@ -357,9 +402,11 @@ export default function FloorScene({ walk = false }) {
         {mainSpaces.map((space) => (
           <Space key={space.id} space={space} />
         ))}
-        {(floor.walls ?? []).map((wall) => (
-          <FreeWall key={wall.id} wall={wall} />
-        ))}
+        {(floor.walls ?? [])
+          .filter((wall) => !wall.frame)
+          .map((wall) => (
+            <FreeWall key={wall.id} wall={wall} />
+          ))}
         {/* 틀어진 건물: 자체 좌표를 쓰는 공간 묶음 */}
         {Object.entries(floor.frames ?? {}).map(([name, f]) => (
           <group key={name} position={[f.originX, 0, -f.originZ]} rotation={[0, (f.angleDeg * Math.PI) / 180, 0]}>
@@ -368,12 +415,17 @@ export default function FloorScene({ walk = false }) {
               .map((space) => (
                 <Space key={space.id} space={space} />
               ))}
+            {(floor.walls ?? [])
+              .filter((wall) => wall.frame === name)
+              .map((wall) => (
+                <FreeWall key={wall.id} wall={wall} />
+              ))}
           </group>
         ))}
       </group>
 
       {walk ? (
-        <WalkControls />
+        <WalkControls toWorld={(x, z) => [x - CENTER_X, -z + CENTER_Z]} />
       ) : (
         <>
           {/* 1칸 = 1m 격자 */}

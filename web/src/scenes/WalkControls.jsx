@@ -14,11 +14,22 @@ const KEYS = {
 
 // 눈높이에서 걸어 다니기: WASD/방향키로 이동, 화면을 끌어서 둘러본다.
 // 벽과 가구는 막히고, 문짝(userData.noCollide)은 그대로 통과한다.
-export default function WalkControls() {
+// 주소 끝에 @x,z,방향 을 붙이면 그 자리에서 시작한다 (지도 좌표. 방향은 도 단위, 0 = 뒤쪽, 90 = 2-2 쪽)
+export default function WalkControls({ toWorld }) {
   const { camera, gl, scene } = useThree()
   const look = useRef({ yaw: -Math.PI / 2, pitch: 0 }) // 처음에 +x(2-2 쪽)를 본다
   const pressed = useRef(new Set())
   const ray = useMemo(() => new Raycaster(), [])
+
+  useEffect(() => {
+    const [x, z, deg] = (location.hash.split('@')[1] ?? '').split(',').map(Number)
+    if (Number.isFinite(x) && Number.isFinite(z)) {
+      const [wx, wz] = toWorld(x, z)
+      camera.position.set(wx, camera.position.y, wz)
+      if (Number.isFinite(deg)) look.current.yaw = (-deg * Math.PI) / 180
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const el = gl.domElement

@@ -15,7 +15,11 @@ const VIEWS = {
     : {}),
 }
 
-const viewFromHash = () => (VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : 'floor')
+// 주소 예: #walk 또는 #walk@41,9.5,0 (@ 뒤는 걷기 시작 위치: 지도 x, z, 바라보는 방향)
+const viewFromHash = () => {
+  const id = location.hash.slice(1).split('@')[0]
+  return VIEWS[id] ? id : 'floor'
+}
 
 export default function App() {
   const [view, setView] = useState(viewFromHash)
