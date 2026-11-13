@@ -3,8 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Raycaster, Vector3 } from 'three'
 
 const SPEED = 4 // m/s (Shift를 누르면 2배)
-const BODY = 0.35 // 벽에서 이만큼 떨어져서 멈춘다
-const KNEE = 0.6 // 충돌을 검사하는 높이. 책상·사물함·벽에 걸린다
+const BODY = 0.23 // 벽에서 이만큼 떨어져서 멈춘다 (몸 크기. 처음 값 0.35의 2/3)
+const KNEE = 0.5 // 충돌을 검사하는 높이. 책상·사물함·벽에 걸린다
 const KEYS = {
   KeyW: [0, 1], ArrowUp: [0, 1],
   KeyS: [0, -1], ArrowDown: [0, -1],

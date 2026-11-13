@@ -329,7 +329,8 @@ export const floorCamera = { position: [-14, 100, 92], fov: 50, far: 600 }
 export const planCamera = { position: [0, 135, 0.1], fov: 40, far: 600 }
 
 // 걸어 다니기 시작 위치: 엘리베이터 앞 복도에서 2-2 쪽을 본다
-const WALK_START = [11 - CENTER_X, 1.5, -9.5 + CENTER_Z]
+const EYE_HEIGHT = 1.0 // 캐릭터 눈높이 (처음 값 1.5m의 2/3, 사용자 요청)
+const WALK_START = [11 - CENTER_X, EYE_HEIGHT, -9.5 + CENTER_Z]
 export const walkCamera = { position: WALK_START, fov: 70, near: 0.05, far: 300 }
 
 const mainSpaces = floor.spaces.filter((s) => !s.frame)
