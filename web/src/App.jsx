@@ -2,10 +2,16 @@ import { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import FloorScene, { floorCamera } from './scenes/FloorScene'
 import ClassroomScene, { classroomCamera } from './scenes/ClassroomScene'
+import PhotoScene, { photoCamera } from './scenes/PhotoScene'
 
 const VIEWS = {
   floor: { label: '층 전체', Scene: FloorScene, camera: floorCamera },
+  plan: { label: '평면 보기', Scene: FloorScene, camera: { position: [0, 135, 0.1], fov: 40, far: 600 } }, // 바로 위에서 내려다봄 (도면과 비교용)
   classroom: { label: '교실 작업실', Scene: ClassroomScene, camera: classroomCamera },
+  // 사진 질감 예시는 학교 사진에서 잘라낸 이미지가 필요해서, 이 컴퓨터의 개발 서버에서만 보인다 (공개 사이트에는 없음)
+  ...(import.meta.env.DEV
+    ? { photo: { label: '사진 질감 예시', Scene: PhotoScene, camera: photoCamera, flat: true } } // flat: 톤 보정 끔
+    : {}),
 }
 
 const viewFromHash = () => (VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : 'floor')
@@ -20,11 +26,11 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  const { Scene, camera } = VIEWS[view]
+  const { Scene, camera, flat = false } = VIEWS[view]
 
   return (
     <>
-      <Canvas key={view} shadows camera={camera} dpr={[1, 2]}>
+      <Canvas key={view} shadows flat={flat} camera={camera} dpr={[1, 2]}>
         <color attach="background" args={['#dfe5e8']} />
         <Scene />
       </Canvas>

@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+import { Shape } from 'three'
 import { OrbitControls, Grid, Text, Billboard } from '@react-three/drei'
 import floor from '../map/floor.json'
 import Classroom from '../models/Classroom'
@@ -9,8 +11,8 @@ const DOOR_H = 2.1
 
 // 지도 좌표 → 화면 좌표: 지도의 (x, z)는 화면의 (x, -z). 뒤쪽이 -z.
 // 전체를 CENTER만큼 옮겨 층 한가운데가 원점에 오게 한다 (FloorScene의 바깥 group).
-const CENTER_X = 28
-const CENTER_Z = 34
+const CENTER_X = 27
+const CENTER_Z = 36
 
 const FLOOR_COLOR = {
   classroom: '#aebbd0',
@@ -126,7 +128,64 @@ function FreeWall({ wall }) {
   )
 }
 
+// 다각형 방: 꼭짓점 목록(points)으로 바닥을 만들고 변마다 벽을 세운다.
+// 직각이 아닌 모서리(두 건물이 만나는 곳)에 쓴다.
+function PolygonSpace({ space }) {
+  const { points, type, label, doorEdges = [] } = space
+  const t = floor.wallThickness / 2
+
+  const shape = useMemo(() => {
+    const s = new Shape()
+    points.forEach(([px, pz], i) => (i ? s.lineTo(px, pz) : s.moveTo(px, pz)))
+    return s
+  }, [points])
+
+  const cx = points.reduce((sum, p) => sum + p[0], 0) / points.length
+  const cz = points.reduce((sum, p) => sum + p[1], 0) / points.length
+
+  return (
+    <group>
+      {/* 바닥: XY 평면에 그린 모양을 눕히면 (x, z) → (x, 0, -z) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]} receiveShadow>
+        <shapeGeometry args={[shape]} />
+        <meshStandardMaterial color={FLOOR_COLOR[type]} />
+      </mesh>
+
+      {points.map(([x1, z1], i) => {
+        const [x2, z2] = points[(i + 1) % points.length]
+        const L = Math.hypot(x2 - x1, z2 - z1)
+        const doors = doorEdges.includes(i) ? [0] : []
+        return (
+          <group key={i} position={[(x1 + x2) / 2, 0, -(z1 + z2) / 2]} rotation={[0, Math.atan2(z2 - z1, x2 - x1), 0]}>
+            {solidSegments(L, doors).map(([a, b]) => (
+              <mesh key={a} position={[(a + b) / 2, H / 2, 0]} castShadow receiveShadow>
+                <boxGeometry args={[b - a, H, t]} />
+                <meshStandardMaterial color={WALL_COLOR} />
+              </mesh>
+            ))}
+            {doors.map((c) => (
+              <mesh key={c} position={[c, (H + DOOR_H) / 2, 0]}>
+                <boxGeometry args={[DOOR_W, H - DOOR_H, t]} />
+                <meshStandardMaterial color={WALL_COLOR} />
+              </mesh>
+            ))}
+          </group>
+        )
+      })}
+
+      {label && (
+        <Billboard position={[cx, H + 0.9, -cz]}>
+          <Text fontSize={0.85} color="#30363b" outlineWidth={0.06} outlineColor="#ffffff" anchorX="center" anchorY="middle">
+            {label}
+          </Text>
+        </Billboard>
+      )}
+    </group>
+  )
+}
+
 function Space({ space }) {
+  if (space.points) return <PolygonSpace space={space} />
   const { x, z, w, d, type, label } = space
 
   // 막힌 덩어리: 천장까지 꽉 찬 상자
