@@ -17,7 +17,8 @@ function tileUV(geometry, [w, h, d], [tu, tv]) {
 
 // tex: 질감 이름(사진 질감 모드에서만 쓰임), tile: 질감 한 장이 덮는 크기 [가로, 세로] (미터)
 // unlit: 조명 계산 없이 질감 색 그대로 (천장처럼 아래에서 빛을 못 받는 면)
-export default function Box({ size, position, color, tex, tile, shadow = true, unlit = false }) {
+// passable: 걸어 다닐 때 막지 않고 통과시킨다 (문짝)
+export default function Box({ size, position, color, tex, tile, shadow = true, unlit = false, passable = false }) {
   const look = useContext(LookContext)
   const map = (look && tex && look[tex]) || null
   const tiled = Boolean(map && tile)
@@ -30,7 +31,7 @@ export default function Box({ size, position, color, tex, tile, shadow = true, u
   }, [size.join(), tiled, tile?.join()])
 
   return (
-    <mesh geometry={geometry} position={position} castShadow={shadow} receiveShadow>
+    <mesh geometry={geometry} position={position} castShadow={shadow} receiveShadow userData={{ noCollide: passable }}>
       {unlit ? (
         <meshBasicMaterial color={map ? '#f2f2f2' : color} map={map} />
       ) : (

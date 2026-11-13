@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import FloorScene, { floorCamera } from './scenes/FloorScene'
+import FloorScene, { WalkScene, floorCamera, planCamera, walkCamera } from './scenes/FloorScene'
 import ClassroomScene, { classroomCamera } from './scenes/ClassroomScene'
 import PhotoScene, { photoCamera } from './scenes/PhotoScene'
 
 const VIEWS = {
   floor: { label: '층 전체', Scene: FloorScene, camera: floorCamera },
-  plan: { label: '평면 보기', Scene: FloorScene, camera: { position: [0, 135, 0.1], fov: 40, far: 600 } }, // 바로 위에서 내려다봄 (도면과 비교용)
+  plan: { label: '평면 보기', Scene: FloorScene, camera: planCamera }, // 바로 위에서 내려다봄 (도면과 비교용)
+  walk: { label: '걸어 다니기', Scene: WalkScene, camera: walkCamera, hint: 'WASD·방향키로 이동 / 화면을 끌어서 둘러보기 / Shift 달리기 / 문은 그대로 통과' },
   classroom: { label: '교실 작업실', Scene: ClassroomScene, camera: classroomCamera },
   // 사진 질감 예시는 학교 사진에서 잘라낸 이미지가 필요해서, 이 컴퓨터의 개발 서버에서만 보인다 (공개 사이트에는 없음)
   ...(import.meta.env.DEV
@@ -26,7 +27,7 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  const { Scene, camera, flat = false } = VIEWS[view]
+  const { Scene, camera, flat = false, hint } = VIEWS[view]
 
   return (
     <>
@@ -54,6 +55,26 @@ export default function App() {
           </a>
         ))}
       </nav>
+
+      {hint && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 12,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '6px 12px',
+            borderRadius: 8,
+            fontSize: 13,
+            color: '#fff',
+            background: 'rgba(31,41,51,0.75)',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {hint}
+        </div>
+      )}
     </>
   )
 }

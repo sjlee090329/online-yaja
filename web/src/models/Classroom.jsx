@@ -11,9 +11,9 @@ const H = spec.height
 const WALL_T = 0.1 // 벽은 8x8m 안쪽에 세운다 (옆 교실과 겹치지 않게)
 const WOOD_TILE = [0.4, 0.64]
 
-function Glass({ size, position }) {
+function Glass({ size, position, passable = false }) {
   return (
-    <mesh position={position}>
+    <mesh position={position} userData={{ noCollide: passable }}>
       <boxGeometry args={size} />
       <meshStandardMaterial color={C.glass} transparent opacity={0.35} />
     </mesh>
@@ -139,8 +139,8 @@ function CorridorWall() {
       {/* 문 + 문 위 고창 */}
       {doorXs.map((x) => (
         <group key={x}>
-          <Box size={[doorW, doorH, 0.05]} position={[x, doorH / 2, z]} color={C.wood} tex="door" />
-          <Glass size={[0.12, 0.7, 0.06]} position={[x - doorW / 4, 1.45, z]} />
+          <Box size={[doorW, doorH, 0.05]} position={[x, doorH / 2, z]} color={C.wood} tex="door" passable />
+          <Glass size={[0.12, 0.7, 0.06]} position={[x - doorW / 4, 1.45, z]} passable />
           <Box size={[doorW, H - doorH, WALL_T]} position={[x, (H + doorH) / 2, z]} color={C.woodDark} tex="wood" tile={WOOD_TILE} />
         </group>
       ))}
